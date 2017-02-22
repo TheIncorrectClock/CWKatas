@@ -1,6 +1,8 @@
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 
 public class AreSame {
 
@@ -17,42 +19,29 @@ public class AreSame {
             return false;
         }
 
-        List<Integer> values = createListFromArray(firstArray);
+        List<Integer> values = createSortedListFromArray(firstArray);
         values = createListOfSquaresFromList(values);
-        Collections.sort(values, Integer::compareTo);
 
-        List<Integer> squares = createListFromArray(secondArray);
-        Collections.sort(squares, Integer::compareTo);
+        List<Integer> squares = createSortedListFromArray(secondArray);
 
-        return isSecondCollectionPowerOfFirstCollection(values, squares);
+        return areTwoListsTheSame(values, squares);
     }
 
     private static boolean areArraysDifferentLength(int[] firstArray, int[] secondArray) {
         return firstArray.length != secondArray.length;
     }
 
-    private static List<Integer> createListFromArray(int[] array) {
-        List<Integer> list = new ArrayList<>(array.length);
-        for(Integer value : array) {
-            list.add(value);
-        }
-        return list;
+    private static List<Integer> createSortedListFromArray(int[] array) {
+        return Arrays.stream(array).boxed().sorted().collect(toList());
     }
 
     private static List<Integer> createListOfSquaresFromList(List<Integer> values) {
-        List<Integer> squares = new ArrayList<>(values.size());
-        for(Integer value : values) {
-            squares.add(value * value);
-        }
-        return squares;
+        return values.stream().map(i -> i * i).collect(toList());
     }
 
-    private static boolean isSecondCollectionPowerOfFirstCollection(List<Integer> firstCollection, List<Integer> secondCollection) {
-        boolean areSame = true;
-        for (int i = 0; i < firstCollection.size(); i++) {
-            areSame = areSame && areValuesTheSame(firstCollection.get(i), secondCollection.get(i));
-        }
-        return areSame;
+    private static boolean areTwoListsTheSame(List<Integer> firstCollection, List<Integer> secondCollection) {
+        return IntStream.range(1, firstCollection.size())
+                        .allMatch(i -> areValuesTheSame(firstCollection.get(i), secondCollection.get(i)));
     }
 
     private static boolean areValuesTheSame(int valueOne, int valueTwo) {
